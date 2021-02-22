@@ -1,0 +1,2 @@
+class UserWithInvalidEmailError(Exception):
+    pass
