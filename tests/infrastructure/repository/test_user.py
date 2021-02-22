@@ -9,3 +9,13 @@ def test_create(database):
 
     assert user.id
     assert user.created_at
+
+
+def test_update(database):
+    user = User(full_name='Foo Wrong', email='foo.bar@email.com', password='a-secret')
+    UserRepository().create(user)
+    user.full_name = 'Foo Bar'
+
+    updated_user = UserRepository().update(user)
+
+    assert updated_user.full_name == 'Foo Bar'

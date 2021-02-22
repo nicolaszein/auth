@@ -18,3 +18,8 @@ class UserAdapter:
         )
 
         return self.__repository.create(entity).to_domain()
+
+    def update(self, user):
+        entity = User.from_domain(user)
+
+        return self.__repository.update(entity).to_domain()
