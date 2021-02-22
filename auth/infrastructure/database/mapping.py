@@ -7,6 +7,7 @@ from sqlalchemy.orm import mapper, relationship
 
 from auth.infrastructure.database.database import Database
 from auth.infrastructure.entity.activation import Activation
+from auth.infrastructure.entity.session import Session
 from auth.infrastructure.entity.user import User
 
 db = Database()
@@ -51,5 +52,23 @@ activation_table = Table(
 )
 
 mapper(Activation, activation_table, properties={
+    'user': relationship(User, lazy='joined', innerjoin=True)
+})
+
+session_table = Table(
+    'session',
+    db.metadata,
+    Column('id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+    Column('user_id', UUID(as_uuid=True), ForeignKey('user.id'), nullable=False, index=True),
+    Column('refresh_token', String(1000), nullable=False, unique=True, index=True),
+    Column(
+        'created_at',
+        DateTime(),
+        nullable=False,
+        default=datetime.datetime.utcnow
+    ),
+)
+
+mapper(Session, session_table, properties={
     'user': relationship(User, lazy='joined', innerjoin=True)
 })
