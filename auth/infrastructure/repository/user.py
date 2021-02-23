@@ -1,4 +1,5 @@
 from auth.infrastructure.database import db
+from auth.infrastructure.entity.activation import Activation
 from auth.infrastructure.entity.user import User
 from auth.infrastructure.event_bus import bus
 
@@ -7,6 +8,14 @@ class UserRepository:
 
     def __init__(self):
         self.__entity = User
+
+    def fetch_by_activation_code(self, code):
+        activation = db.session.query(Activation).filter_by(code=code).first()
+
+        if not activation:
+            return None
+
+        return activation.user
 
     def create(self, user):
         return self.__save(user)

@@ -2,7 +2,10 @@ import uuid
 from dataclasses import replace
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from auth.domain.user import User
+from auth.infrastructure.exception import UserNotFound
 from auth.infrastructure.user_adapter import UserAdapter
 
 
@@ -42,3 +45,23 @@ def test_update(user_repository_mock, user_entity_mock):
 
     assert result == user
     user_entity_mock.from_domain.assert_called_once_with(user)
+
+
+@patch('auth.infrastructure.user_adapter.UserRepository')
+def test_fetch_by_activation_code(user_repository_mock):
+    user = MagicMock()
+    user_repository_mock().fetch_by_activation_code.return_value = user
+    code = '123'
+
+    result = UserAdapter().fetch_by_activation_code(code=code)
+
+    assert result == user
+
+
+@patch('auth.infrastructure.user_adapter.UserRepository')
+def test_fetch_by_activation_code_with_user_not_found(user_repository_mock):
+    code = '123'
+    user_repository_mock().fetch_by_activation_code.return_value = None
+
+    with pytest.raises(UserNotFound):
+        UserAdapter().fetch_by_activation_code(code=code)
