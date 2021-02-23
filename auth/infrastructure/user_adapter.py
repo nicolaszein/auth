@@ -9,13 +9,8 @@ class UserAdapter:
         self.__repository = UserRepository()
         self.__password = Password
 
-    def create(self, full_name, email, password):
-        hashed_password = self.__password.hash_password(password)
-        entity = User(
-            full_name=full_name,
-            email=email,
-            password=hashed_password
-        )
+    def create(self, user):
+        entity = User.from_domain(user)
 
         return self.__repository.create(entity).to_domain()
 
