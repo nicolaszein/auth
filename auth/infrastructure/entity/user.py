@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from auth.domain.event.event import Event
 from auth.domain.user import User as UserDomain
+from auth.infrastructure.entity.activation import Activation
 
 
 @dataclass
@@ -19,6 +20,7 @@ class User:
     updated_at: Optional[datetime] = None
 
     events: List[Event] = field(default_factory=lambda: [])
+    activations: List[Activation] = field(default_factory=lambda: [])
 
     @classmethod
     def from_domain(cls, domain):
@@ -28,6 +30,7 @@ class User:
             email=domain.email,
             password=domain.password,
             is_active=domain.is_active,
+            activations=[Activation.from_domain(activation) for activation in domain.activations],
             events=domain.events
         )
 
@@ -37,5 +40,6 @@ class User:
             full_name=self.full_name,
             email=self.email,
             password=self.password,
-            is_active=self.is_active
+            is_active=self.is_active,
+            activations=[activation.to_domain() for activation in self.activations]
         )
