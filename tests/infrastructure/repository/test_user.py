@@ -1,3 +1,7 @@
+from unittest.mock import patch
+
+from auth.domain.event.user_created import UserCreated
+from auth.domain.user import User as UserDomain
 from auth.infrastructure.entity.user import User
 from auth.infrastructure.repository.user import UserRepository
 
@@ -19,3 +23,19 @@ def test_update(database):
     updated_user = UserRepository().update(user)
 
     assert updated_user.full_name == 'Foo Bar'
+
+
+@patch('auth.infrastructure.repository.user.bus')
+def test_emit_events(bus_mock, database):
+    user = UserDomain(full_name='Foo Wrong', email='foo.bar@email.com', password='a-secret')
+    event = UserCreated(user)
+    entity = User(
+        full_name='Foo Wrong',
+        email='foo.bar@email.com',
+        password='a-secret',
+        events=[event]
+    )
+
+    UserRepository().create(entity)
+
+    bus_mock.emit.assert_called_once_with(event.name, **event.to_dict())

@@ -1,8 +1,9 @@
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
+from auth.domain.event.event import Event
 from auth.domain.user import User as UserDomain
 
 
@@ -17,6 +18,8 @@ class User:
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
+    events: List[Event] = field(default_factory=lambda: [])
+
     @classmethod
     def from_domain(cls, domain):
         return cls(
@@ -24,7 +27,8 @@ class User:
             full_name=domain.full_name,
             email=domain.email,
             password=domain.password,
-            is_active=domain.is_active
+            is_active=domain.is_active,
+            events=domain.events
         )
 
     def to_domain(self):
