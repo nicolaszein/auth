@@ -22,11 +22,13 @@ class Activation:
             id=domain.id,
             user_id=domain.user_id,
             code=domain.code,
+            created_at=domain.created_at,
         )
 
     def to_domain(self):
         return ActivationDomain(
             id=self.id,
             user=self.user,
-            code=self.code
+            code=self.code,
+            created_at=self.created_at
         )

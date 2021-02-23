@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 from auth.domain.activation import Activation as ActivationDomain
@@ -7,6 +8,7 @@ from auth.infrastructure.entity.user import User
 
 
 def test_from_domain():
+    created_at = datetime.datetime.now()
     user = UserDomain(
         id=uuid.uuid4(),
         full_name='Foo Bar',
@@ -14,15 +16,17 @@ def test_from_domain():
         password='a-secret',
         is_active=True
     )
-    domain = ActivationDomain(user=user)
+    domain = ActivationDomain(user=user, created_at=created_at)
 
     activation = Activation.from_domain(domain)
 
     assert activation.user_id == user.id
     assert activation.code == domain.code
+    assert activation.created_at == created_at
 
 
 def test_to_domain():
+    created_at = datetime.datetime.now()
     code = '123456'
     activation_id = uuid.uuid4()
     user = User(
@@ -32,7 +36,7 @@ def test_to_domain():
         password='a-secret',
         is_active=True
     )
-    activation = Activation(id=activation_id, user_id=user.id, code=code)
+    activation = Activation(id=activation_id, user_id=user.id, code=code, created_at=created_at)
     activation.user = user
 
     domain = activation.to_domain()
@@ -40,3 +44,4 @@ def test_to_domain():
     assert domain.id == activation_id
     assert domain.code == code
     assert domain.user == user
+    assert domain.created_at == created_at

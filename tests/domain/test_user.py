@@ -1,10 +1,11 @@
+import datetime
 import uuid
 
 import pytest
 
 from auth.domain.activation import Activation
 from auth.domain.event.user_created import UserCreated
-from auth.domain.exception import UserWithInvalidEmailError
+from auth.domain.exception import ActivationExpired, ActivationNotFound, UserWithInvalidEmail
 from auth.domain.user import User
 
 
@@ -19,7 +20,7 @@ def test_valid_email():
 def test_invalid_email():
     email = 'invalid-email'
 
-    with pytest.raises(UserWithInvalidEmailError):
+    with pytest.raises(UserWithInvalidEmail):
         User(full_name='Foo Bar', email=email, password='a-secret')
 
 
@@ -48,3 +49,53 @@ def test_create_activation():
 
     assert len(user.activations) == 1
     assert isinstance(user.activations[0], Activation)
+
+
+def test_activate():
+    created_at = datetime.datetime.now()
+    activation = Activation(user=None, created_at=created_at)
+    email = 'foo.bar@email.com'
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email=email,
+        password='a-secret',
+        activations=[activation]
+    )
+
+    activated_user = user.activate(code=activation.code)
+
+    assert len(activated_user.activations) == 0
+    assert activated_user.is_active
+
+
+def test_activate_with_code_not_found():
+    created_at = datetime.datetime.now()
+    activation = Activation(user=None, created_at=created_at)
+    email = 'foo.bar@email.com'
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email=email,
+        password='a-secret',
+        activations=[activation]
+    )
+
+    with pytest.raises(ActivationNotFound):
+        user.activate(code='not_found')
+
+
+def test_activate_with_expired_code():
+    created_at = datetime.datetime(2019, 1, 1)
+    activation = Activation(user=None, created_at=created_at)
+    email = 'foo.bar@email.com'
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email=email,
+        password='a-secret',
+        activations=[activation]
+    )
+
+    with pytest.raises(ActivationExpired):
+        user.activate(code=activation.code)

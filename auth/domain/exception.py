@@ -1,2 +1,10 @@
-class UserWithInvalidEmailError(Exception):
+class UserWithInvalidEmail(Exception):
+    pass
+
+
+class ActivationNotFound(Exception):
+    pass
+
+
+class ActivationExpired(Exception):
     pass
