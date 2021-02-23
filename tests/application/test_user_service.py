@@ -1,6 +1,8 @@
+from datetime import datetime
 from unittest.mock import patch
 
 from auth.application.user_service import UserService
+from auth.domain.activation import Activation
 from auth.domain.user import User
 
 
@@ -22,3 +24,21 @@ def test_signup(user_adapter_mock, password_mock):
     )
 
     assert persisted_user == user
+
+
+@patch('auth.application.user_service.UserAdapter')
+def test_activate(user_adapter_mock):
+    activation = Activation(user=None, created_at=datetime.now())
+    user = User(
+        full_name='Foo Bar',
+        email='foo@email.com',
+        password='hashed-password',
+        activations=[activation]
+    )
+    user_adapter_mock().fetch_by_activation_code.return_value = user
+    user_adapter_mock().update.side_effect = lambda x: x
+
+    persisted_user = UserService().activate(code=activation.code)
+
+    assert len(persisted_user.activations) == 0
+    assert persisted_user.is_active

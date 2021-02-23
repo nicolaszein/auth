@@ -17,3 +17,8 @@ class UserService:
             password=hashed_password
         )
         return self.__user_adapter.create(user)
+
+    def activate(self, code):
+        user = self.__user_adapter.fetch_by_activation_code(code=code)
+
+        return self.__user_adapter.update(user.activate(code=code))
