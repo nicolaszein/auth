@@ -1,3 +1,4 @@
+import uuid
 from unittest.mock import patch
 
 from auth.domain.event.user_created import UserCreated
@@ -23,6 +24,31 @@ def test_update(database):
     updated_user = UserRepository().update(user)
 
     assert updated_user.full_name == 'Foo Bar'
+
+
+def test_fetch_by_id(database):
+    entity = User(full_name='Foo Wrong', email='foo.bar@email.com', password='a-secret')
+    UserRepository().create(entity)
+
+    user = UserRepository().fetch_by_id(id=entity.id)
+
+    assert user.id == entity.id
+
+
+def test_fetch_by_id_not_found(database):
+    user = UserRepository().fetch_by_id(id=uuid.uuid4())
+
+    assert user is None
+
+
+def test_fetch_by_email(database):
+    email = 'foo.bar@email.com'
+    entity = User(full_name='Foo Wrong', email=email, password='a-secret')
+    UserRepository().create(entity)
+
+    user = UserRepository().fetch_by_email(email=email)
+
+    assert user.id == entity.id
 
 
 def test_fetch_by_activation_code(database):

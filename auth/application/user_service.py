@@ -18,6 +18,12 @@ class UserService:
         )
         return self.__user_adapter.create(user)
 
+    def create_activation(self, user_id):
+        user = self.__user_adapter.fetch_by_id(id=user_id)
+        user.create_activation()
+
+        return self.__user_adapter.update(user)
+
     def activate(self, code):
         user = self.__user_adapter.fetch_by_activation_code(code=code)
 

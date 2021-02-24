@@ -10,13 +10,29 @@ class UserAdapter:
         self.__repository = UserRepository()
         self.__password = Password
 
+    def fetch_by_id(self, id):
+        user = self.__repository.fetch_by_id(id=id)
+
+        if not user:
+            raise UserNotFound(f'User with id {id} not found')
+
+        return user.to_domain()
+
+    def fetch_by_email(self, email):
+        user = self.__repository.fetch_by_email(email=email)
+
+        if not user:
+            raise UserNotFound(f'User with id {email} not found')
+
+        return user.to_domain()
+
     def fetch_by_activation_code(self, code):
         user = self.__repository.fetch_by_activation_code(code=code)
 
         if not user:
             raise UserNotFound(f'User with activation code {code} not found')
 
-        return user
+        return user.to_domain()
 
     def create(self, user):
         entity = User.from_domain(user)

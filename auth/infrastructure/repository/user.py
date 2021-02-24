@@ -9,6 +9,12 @@ class UserRepository:
     def __init__(self):
         self.__entity = User
 
+    def fetch_by_id(self, id):
+        return db.session.query(self.__entity).filter_by(id=id).first()
+
+    def fetch_by_email(self, email):
+        return db.session.query(self.__entity).filter_by(email=email).first()
+
     def fetch_by_activation_code(self, code):
         activation = db.session.query(Activation).filter_by(code=code).first()
 
