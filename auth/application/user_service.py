@@ -10,7 +10,7 @@ class UserService:
         self.__user_adapter = UserAdapter()
         self.__password = Password
 
-    def signup(self, full_name, email, password):
+    def sign_up(self, full_name, email, password):
         hashed_password = self.__password.hash_password(password)
         user = User(
             full_name=full_name,
@@ -19,7 +19,7 @@ class UserService:
         )
         return self.__user_adapter.create(user)
 
-    def signin(self, email, password):
+    def sign_in(self, email, password):
         user = self.__user_adapter.fetch_by_email(email=email)
 
         if not self.__password.validate_password(password=password, hashed_password=user.password):

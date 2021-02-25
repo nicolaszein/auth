@@ -12,7 +12,7 @@ from auth.domain.user import User
 
 @patch('auth.application.user_service.Password')
 @patch('auth.application.user_service.UserAdapter')
-def test_signup(user_adapter_mock, password_mock):
+def test_sign_up(user_adapter_mock, password_mock):
     password_mock.hash_password.return_value = 'hashed-password'
     user = User(
         full_name='Foo Bar',
@@ -21,7 +21,7 @@ def test_signup(user_adapter_mock, password_mock):
     )
     user_adapter_mock().create.return_value = user
 
-    persisted_user = UserService().signup(
+    persisted_user = UserService().sign_up(
         full_name='Foo Bar',
         email='foo@email.com',
         password='a-secret'
@@ -32,7 +32,7 @@ def test_signup(user_adapter_mock, password_mock):
 
 @patch('auth.application.user_service.Password')
 @patch('auth.application.user_service.UserAdapter')
-def test_signin(user_adapter_mock, password_mock):
+def test_sign_in(user_adapter_mock, password_mock):
     email = 'foo@email.com'
     password = 'a-secret'
     password_mock.validate_password.return_value = True
@@ -45,7 +45,7 @@ def test_signin(user_adapter_mock, password_mock):
     user_adapter_mock().fetch_by_email.return_value = user
     user_adapter_mock().create_session.return_value = 'Session'
 
-    result = UserService().signin(
+    result = UserService().sign_in(
         email=email,
         password=password
     )
@@ -61,7 +61,7 @@ def test_signin(user_adapter_mock, password_mock):
 
 @patch('auth.application.user_service.Password')
 @patch('auth.application.user_service.UserAdapter')
-def test_signin_with_password_invalid(user_adapter_mock, password_mock):
+def test_sign_in_with_password_invalid(user_adapter_mock, password_mock):
     email = 'foo@email.com'
     password = 'invalid-password'
     user = User(
@@ -73,7 +73,7 @@ def test_signin_with_password_invalid(user_adapter_mock, password_mock):
     user_adapter_mock().fetch_by_email.return_value = user
 
     with pytest.raises(InvalidCredentials):
-        UserService().signin(
+        UserService().sign_in(
             email=email,
             password=password
         )
@@ -81,7 +81,7 @@ def test_signin_with_password_invalid(user_adapter_mock, password_mock):
 
 @patch('auth.application.user_service.Password')
 @patch('auth.application.user_service.UserAdapter')
-def test_signin_with_user_not_activated(user_adapter_mock, password_mock):
+def test_sign_in_with_user_not_activated(user_adapter_mock, password_mock):
     email = 'foo@email.com'
     password = 'invalid-password'
     user = User(
@@ -94,7 +94,7 @@ def test_signin_with_user_not_activated(user_adapter_mock, password_mock):
     user_adapter_mock().fetch_by_email.return_value = user
 
     with pytest.raises(UserNotActivated):
-        UserService().signin(
+        UserService().sign_in(
             email=email,
             password=password
         )
