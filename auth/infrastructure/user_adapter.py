@@ -1,14 +1,20 @@
+from auth.domain.session import Session as SessionDomain
+from auth.infrastructure.entity.session import Session
 from auth.infrastructure.entity.user import User
 from auth.infrastructure.exception import UserNotFound
 from auth.infrastructure.password import Password
+from auth.infrastructure.repository.session import SessionRepository
 from auth.infrastructure.repository.user import UserRepository
+from auth.infrastructure.token import Token
 
 
 class UserAdapter:
 
     def __init__(self):
         self.__repository = UserRepository()
+        self.__session_repository = SessionRepository()
         self.__password = Password
+        self.__token = Token()
 
     def fetch_by_id(self, id):
         user = self.__repository.fetch_by_id(id=id)
@@ -43,3 +49,16 @@ class UserAdapter:
         entity = User.from_domain(user)
 
         return self.__repository.update(entity).to_domain()
+
+    def create_session(self, user):
+        refresh_token = self.__token.generate_refresh_token(user_id=user.id)
+        session = self.__session_repository.create(
+            Session(
+                user_id=user.id,
+                refresh_token=refresh_token
+            )
+        )
+
+        access_token = self.__token.generate_token(user_id=user.id, session_id=session.id)
+
+        return SessionDomain(user=user, access_token=access_token, refresh_token=refresh_token)

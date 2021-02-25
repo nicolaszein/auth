@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from auth.domain.user import User
+from auth.infrastructure.entity.session import Session
 from auth.infrastructure.exception import UserNotFound
 from auth.infrastructure.user_adapter import UserAdapter
 
@@ -125,3 +126,27 @@ def test_fetch_by_activation_code_with_user_not_found(user_repository_mock):
 
     with pytest.raises(UserNotFound):
         UserAdapter().fetch_by_activation_code(code=code)
+
+
+@patch('auth.infrastructure.user_adapter.Token')
+@patch('auth.infrastructure.user_adapter.SessionRepository')
+def test_create_session(session_repository_mock, token_mock):
+    user_id = uuid.uuid4()
+    user = User(
+        id=user_id,
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='hashed_password'
+    )
+    session = Session(id=uuid.uuid4(), user_id=user_id, refresh_token='refresh_token')
+    session_repository_mock().create.return_value = session
+    token_mock().generate_token.return_value = 'access_token'
+    token_mock().generate_refresh_token.return_value = 'refresh_token'
+
+    result = UserAdapter().create_session(user)
+
+    assert result.user == user
+    assert result.access_token == 'access_token'
+    assert result.refresh_token == 'refresh_token'
+    token_mock().generate_refresh_token.assert_called_once_with(user_id=user_id)
+    token_mock().generate_token.assert_called_once_with(user_id=user_id, session_id=session.id)
