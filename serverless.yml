@@ -1,0 +1,29 @@
+service: auth
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  stage: dev
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  environment:
+    DATABASE_URL: ${ssm:/auth/${self:custom.stage}/DATABASE_URL~true}
+  apiGateway:
+    shouldStartNameWithService: true
+
+functions:
+  signup:
+    handler: auth/view/function/sign_up.handle
+    events:
+      - http:
+          path: /signup
+          method: post
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  pythonRequirements:
+    dockerizePip: non-linux
