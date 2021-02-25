@@ -2,6 +2,9 @@ import uuid
 from datetime import datetime
 from unittest.mock import patch
 
+import pytest
+
+from auth.application.exception import InvalidCredentials, UserNotActivated
 from auth.application.user_service import UserService
 from auth.domain.activation import Activation
 from auth.domain.user import User
@@ -25,6 +28,76 @@ def test_signup(user_adapter_mock, password_mock):
     )
 
     assert persisted_user == user
+
+
+@patch('auth.application.user_service.Password')
+@patch('auth.application.user_service.UserAdapter')
+def test_signin(user_adapter_mock, password_mock):
+    email = 'foo@email.com'
+    password = 'a-secret'
+    password_mock.validate_password.return_value = True
+    user = User(
+        full_name='Foo Bar',
+        email='foo@email.com',
+        password='hashed-password',
+        is_active=True
+    )
+    user_adapter_mock().fetch_by_email.return_value = user
+    user_adapter_mock().create_session.return_value = 'Session'
+
+    result = UserService().signin(
+        email=email,
+        password=password
+    )
+
+    assert result == 'Session'
+    user_adapter_mock().fetch_by_email.assert_called_once_with(email=email)
+    user_adapter_mock().create_session.assert_called_once_with(user=user)
+    password_mock.validate_password.assert_called_once_with(
+        password=password,
+        hashed_password='hashed-password'
+    )
+
+
+@patch('auth.application.user_service.Password')
+@patch('auth.application.user_service.UserAdapter')
+def test_signin_with_password_invalid(user_adapter_mock, password_mock):
+    email = 'foo@email.com'
+    password = 'invalid-password'
+    user = User(
+        full_name='Foo Bar',
+        email='foo@email.com',
+        password='hashed-password'
+    )
+    password_mock.validate_password.return_value = False
+    user_adapter_mock().fetch_by_email.return_value = user
+
+    with pytest.raises(InvalidCredentials):
+        UserService().signin(
+            email=email,
+            password=password
+        )
+
+
+@patch('auth.application.user_service.Password')
+@patch('auth.application.user_service.UserAdapter')
+def test_signin_with_user_not_activated(user_adapter_mock, password_mock):
+    email = 'foo@email.com'
+    password = 'invalid-password'
+    user = User(
+        full_name='Foo Bar',
+        email='foo@email.com',
+        password='hashed-password',
+        is_active=False
+    )
+    password_mock.validate_password.return_value = True
+    user_adapter_mock().fetch_by_email.return_value = user
+
+    with pytest.raises(UserNotActivated):
+        UserService().signin(
+            email=email,
+            password=password
+        )
 
 
 @patch('auth.application.user_service.UserAdapter')

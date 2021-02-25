@@ -2,7 +2,6 @@ from auth.domain.session import Session as SessionDomain
 from auth.infrastructure.entity.session import Session
 from auth.infrastructure.entity.user import User
 from auth.infrastructure.exception import UserNotFound
-from auth.infrastructure.password import Password
 from auth.infrastructure.repository.session import SessionRepository
 from auth.infrastructure.repository.user import UserRepository
 from auth.infrastructure.token import Token
@@ -13,7 +12,6 @@ class UserAdapter:
     def __init__(self):
         self.__repository = UserRepository()
         self.__session_repository = SessionRepository()
-        self.__password = Password
         self.__token = Token()
 
     def fetch_by_id(self, id):
