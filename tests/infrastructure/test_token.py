@@ -66,11 +66,10 @@ def test_generate_refresh_token(jwt_mock):
     expected_payload = {
         'iat': datetime.datetime.timestamp(iat),
         'iss': iss,
-        'session_id': 'session-id',
         'user_id': 'user-id'
     }
 
-    refresh_token = Token().generate_refresh_token(user_id='user-id', session_id='session-id')
+    refresh_token = Token().generate_refresh_token(user_id='user-id')
 
     jwt_mock.encode.assert_called_once_with(
         expected_payload,
