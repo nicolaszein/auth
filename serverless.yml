@@ -56,6 +56,16 @@ functions:
       - http:
           path: /signup
           method: post
+  create-activation:
+    handler: auth/view/function/create_activation.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - UserQueue
+              - Arn
 
 plugins:
   - serverless-offline

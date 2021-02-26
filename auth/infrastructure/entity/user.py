@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
+from typing import ClassVar, List, Optional
 
 from auth.domain.event.event import Event
 from auth.domain.user import User as UserDomain
@@ -19,7 +19,7 @@ class User:
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
-    events: List[Event] = field(default_factory=lambda: [])
+    events: ClassVar[List[Event]] = field(default=[])
     activations: List[Activation] = field(default_factory=lambda: [])
 
     @classmethod
