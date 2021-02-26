@@ -1,3 +1,5 @@
+import uuid
+
 from auth.application.exception import InvalidCredentials, UserNotActivated
 from auth.domain.user import User
 from auth.infrastructure.password import Password
@@ -13,10 +15,12 @@ class UserService:
     def sign_up(self, full_name, email, password):
         hashed_password = self.__password.hash_password(password)
         user = User(
+            id=uuid.uuid4(),
             full_name=full_name,
             email=email,
             password=hashed_password
         )
+        user.add_user_created_event()
         return self.__user_adapter.create(user)
 
     def sign_in(self, email, password):

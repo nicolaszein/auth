@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -28,6 +28,21 @@ def test_sign_up(user_adapter_mock, password_mock):
     )
 
     assert persisted_user == user
+
+
+@patch('auth.application.user_service.User')
+@patch('auth.application.user_service.UserAdapter')
+def test_sign_up_add_created_user_event(user_adapter_mock, user_mock):
+    user = Mock()
+    user_mock.return_value = user
+
+    UserService().sign_up(
+        full_name='Foo Bar',
+        email='foo@email.com',
+        password='a-secret'
+    )
+
+    user.add_user_created_event.assert_called()
 
 
 @patch('auth.application.user_service.Password')

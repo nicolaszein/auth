@@ -1,19 +1,57 @@
 service: auth
 frameworkVersion: '2'
 
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  pythonRequirements:
+    slim: true
+    strip: false
+    layer: true
+    dockerizePip: non-linux
+
 provider:
   name: aws
   stage: dev
   runtime: python3.8
   lambdaHashingVersion: 20201221
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - sqs:SendMessage
+            - sqs:GetQueueUrl
+          Resource:
+            Fn::GetAtt:
+              - UserQueue
+              - Arn
   environment:
+    ENVIRONMENT: ${self:custom.stage}
     DATABASE_URL: ${ssm:/auth/${self:custom.stage}/DATABASE_URL~true}
   apiGateway:
     shouldStartNameWithService: true
 
+package:
+  exclude:
+    - .cache/**
+    - .git/**
+    - .github/**
+    - .pytest_cache/**
+    - .DS_Store
+    - node_modules/**
+    - Makefile
+    - package-lock.json
+    - README.md
+    - LICENSE
+    - .gitignore
+    - tests/**
+    - pytest.ini
+
 functions:
   signup:
     handler: auth/view/function/sign_up.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
     events:
       - http:
           path: /signup
@@ -23,7 +61,9 @@ plugins:
   - serverless-offline
   - serverless-python-requirements
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-  pythonRequirements:
-    dockerizePip: non-linux
+resources:
+  Resources:
+    UserQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "auth-${self:custom.stage}-user"

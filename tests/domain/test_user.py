@@ -24,21 +24,14 @@ def test_invalid_email():
         User(full_name='Foo Bar', email=email, password='a-secret')
 
 
-def test_init_append_user_created_event():
+def test_add_user_created_event():
     email = 'foo.bar@email.com'
-
     user = User(full_name='Foo Bar', email=email, password='a-secret')
+
+    user.add_user_created_event()
 
     assert len(user.events) == 1
     assert isinstance(user.events[0], UserCreated)
-
-
-def test_init_does_not_append_user_created_event():
-    email = 'foo.bar@email.com'
-
-    user = User(id=uuid.uuid4(), full_name='Foo Bar', email=email, password='a-secret')
-
-    assert len(user.events) == 0
 
 
 def test_create_activation():

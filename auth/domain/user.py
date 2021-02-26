@@ -27,8 +27,8 @@ class User:
         if not email_regex.match(self.email):
             raise UserWithInvalidEmail(f'{self.email} is invalid.')
 
-        if not self.id:
-            self.events.append(UserCreated(user=self))
+    def add_user_created_event(self):
+        self.events.append(UserCreated(user=self))
 
     def create_activation(self):
         self.activations.append(Activation(user=self))

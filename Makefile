@@ -6,3 +6,6 @@ migrate:
 
 downgrade:
 	alembic downgrade -1
+
+install_all_requirements:
+	pip install -r requirements.txt -r requirements_test.txt
