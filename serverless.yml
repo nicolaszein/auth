@@ -56,6 +56,14 @@ functions:
       - http:
           path: /signup
           method: post
+  activate:
+    handler: auth/view/function/activate.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - http:
+          path: /users/activate
+          method: post
   create-activation:
     handler: auth/view/function/create_activation.handle
     layers:

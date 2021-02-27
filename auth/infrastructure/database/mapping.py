@@ -36,7 +36,12 @@ user_table = Table(
 )
 
 mapper(User, user_table, properties={
-    'activations': relationship(Activation, lazy='joined', innerjoin=False)
+    'activations': relationship(
+        Activation,
+        lazy='joined',
+        innerjoin=False,
+        cascade="all, delete-orphan"
+    )
 })
 
 activation_table = Table(

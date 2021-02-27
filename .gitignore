@@ -134,5 +134,8 @@ node_modules
 # IDE
 .idea
 
+# OS Files
+.DS_Store
+
 # Serverless directories
 .serverless

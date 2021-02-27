@@ -4,7 +4,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from auth.settings import DATABASE_URL
 
 engine = create_engine(DATABASE_URL)
-Session = scoped_session(sessionmaker(bind=engine))
+Session = scoped_session(sessionmaker(bind=engine, expire_on_commit=False))
 
 
 class Database:
@@ -19,7 +19,7 @@ class Database:
     def __init__(self):
         self.__metadata = MetaData()
         self.__engine = engine
-        self.__session = Session
+        self.__session = Session()
 
     @property
     def metadata(self):
