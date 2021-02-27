@@ -2,6 +2,7 @@ import uuid
 
 from auth.domain.activation import Activation as ActivationDomain
 from auth.domain.user import User as UserDomain
+from auth.domain.user_status import UserStatus
 from auth.infrastructure.entity.activation import Activation
 from auth.infrastructure.entity.user import User
 
@@ -12,7 +13,7 @@ def test_from_domain():
         full_name='Foo Bar',
         email='foo.bar@email.com',
         password='a-secret',
-        is_active=True
+        status=UserStatus.ACTIVE
     )
     domain.create_activation()
 
@@ -22,7 +23,7 @@ def test_from_domain():
     assert user_entity.full_name == domain.full_name
     assert user_entity.email == domain.email
     assert user_entity.password == domain.password
-    assert user_entity.is_active
+    assert user_entity.status == UserStatus.ACTIVE.value
     assert len(user_entity.activations) == 1
     assert isinstance(user_entity.activations[0], Activation)
 
@@ -35,7 +36,7 @@ def test_to_domain():
         full_name='Foo Bar',
         email='foo.bar@email.com',
         password='a-secret',
-        is_active=True,
+        status=UserStatus.ACTIVE.value,
         activations=[activation]
     )
 

@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, String, Table)
+from sqlalchemy import (Column, DateTime, ForeignKey, String, Table)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import mapper, relationship
 
@@ -19,7 +19,7 @@ user_table = Table(
     Column('full_name', String(255), nullable=False),
     Column('email', String(255), nullable=False, unique=True),
     Column('password', String(), nullable=False),
-    Column('is_active', Boolean(), nullable=False, default=False),
+    Column('status', String(20), nullable=False),
     Column(
         'created_at',
         DateTime(),

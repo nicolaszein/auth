@@ -2,12 +2,18 @@ import uuid
 from unittest.mock import patch
 
 from auth.domain.user import User as UserDomain
+from auth.domain.user_status import UserStatus
 from auth.infrastructure.entity.user import User
 from auth.infrastructure.repository.user import UserRepository
 
 
 def test_create(database):
-    user = User(full_name='Foo Bar', email='foo.bar@email.com', password='a-secret')
+    user = User(
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='a-secret',
+        status=UserStatus.ACTIVE.value
+    )
 
     UserRepository().create(user)
 
@@ -16,7 +22,12 @@ def test_create(database):
 
 
 def test_update(database):
-    user = User(full_name='Foo Wrong', email='foo.bar@email.com', password='a-secret')
+    user = User(
+        full_name='Foo Wrong',
+        email='foo.bar@email.com',
+        password='a-secret',
+        status=UserStatus.ACTIVE.value
+    )
     UserRepository().create(user)
     user.full_name = 'Foo Bar'
 
@@ -26,7 +37,12 @@ def test_update(database):
 
 
 def test_fetch_by_id(database):
-    entity = User(full_name='Foo Wrong', email='foo.bar@email.com', password='a-secret')
+    entity = User(
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='a-secret',
+        status=UserStatus.ACTIVE.value
+    )
     UserRepository().create(entity)
 
     user = UserRepository().fetch_by_id(id=entity.id)
@@ -42,7 +58,12 @@ def test_fetch_by_id_not_found(database):
 
 def test_fetch_by_email(database):
     email = 'foo.bar@email.com'
-    entity = User(full_name='Foo Wrong', email=email, password='a-secret')
+    entity = User(
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='a-secret',
+        status=UserStatus.ACTIVE.value
+    )
     UserRepository().create(entity)
 
     user = UserRepository().fetch_by_email(email=email)

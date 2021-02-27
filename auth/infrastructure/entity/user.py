@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from auth.domain.event.event import Event
 from auth.domain.user import User as UserDomain
+from auth.domain.user_status import UserStatus
 from auth.infrastructure.entity.activation import Activation
 
 
@@ -12,7 +13,7 @@ class User:
     full_name: str
     email: str
     password: str
-    is_active: Optional[bool] = False
+    status: str
 
     id: Optional[uuid.UUID] = None
 
@@ -30,7 +31,7 @@ class User:
             full_name=domain.full_name,
             email=domain.email,
             password=domain.password,
-            is_active=domain.is_active,
+            status=domain.status.value,
             activations=[Activation.from_domain(activation) for activation in domain.activations],
         )
         user.__set_events(domain.events)
@@ -42,7 +43,7 @@ class User:
             full_name=self.full_name,
             email=self.email,
             password=self.password,
-            is_active=self.is_active,
+            status=UserStatus(self.status),
             activations=[activation.to_domain() for activation in self.activations]
         )
 

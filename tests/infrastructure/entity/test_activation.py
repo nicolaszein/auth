@@ -3,6 +3,7 @@ import uuid
 
 from auth.domain.activation import Activation as ActivationDomain
 from auth.domain.user import User as UserDomain
+from auth.domain.user_status import UserStatus
 from auth.infrastructure.entity.activation import Activation
 from auth.infrastructure.entity.user import User
 
@@ -14,7 +15,7 @@ def test_from_domain():
         full_name='Foo Bar',
         email='foo.bar@email.com',
         password='a-secret',
-        is_active=True
+        status=UserStatus.ACTIVE
     )
     domain = ActivationDomain(user=user, created_at=created_at)
 
@@ -34,7 +35,7 @@ def test_to_domain():
         full_name='Foo Bar',
         email='foo.bar@email.com',
         password='a-secret',
-        is_active=True
+        status=UserStatus.ACTIVE
     )
     activation = Activation(id=activation_id, user_id=user.id, code=code, created_at=created_at)
     activation.user = user

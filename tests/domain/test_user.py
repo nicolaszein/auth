@@ -7,6 +7,7 @@ from auth.domain.activation import Activation
 from auth.domain.event.user_created import UserCreated
 from auth.domain.exception import ActivationExpired, ActivationNotFound, UserWithInvalidEmail
 from auth.domain.user import User
+from auth.domain.user_status import UserStatus
 
 
 def test_valid_email():
@@ -22,6 +23,22 @@ def test_invalid_email():
 
     with pytest.raises(UserWithInvalidEmail):
         User(full_name='Foo Bar', email=email, password='a-secret')
+
+
+def test_is_valid_true():
+    email = 'foo.bar@email.com'
+
+    user = User(full_name='Foo Bar', email=email, password='a-secret', status=UserStatus.ACTIVE)
+
+    assert user.is_active
+
+
+def test_is_valid_false():
+    email = 'foo.bar@email.com'
+
+    user = User(full_name='Foo Bar', email=email, password='a-secret', status=UserStatus.INACTIVE)
+
+    assert not user.is_active
 
 
 def test_add_user_created_event():

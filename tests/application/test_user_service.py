@@ -8,6 +8,7 @@ from auth.application.exception import InvalidCredentials, UserNotActivated
 from auth.application.user_service import UserService
 from auth.domain.activation import Activation
 from auth.domain.user import User
+from auth.domain.user_status import UserStatus
 
 
 @patch('auth.application.user_service.Password')
@@ -55,7 +56,7 @@ def test_sign_in(user_adapter_mock, password_mock):
         full_name='Foo Bar',
         email='foo@email.com',
         password='hashed-password',
-        is_active=True
+        status=UserStatus.ACTIVE
     )
     user_adapter_mock().fetch_by_email.return_value = user
     user_adapter_mock().create_session.return_value = 'Session'
@@ -103,7 +104,7 @@ def test_sign_in_with_user_not_activated(user_adapter_mock, password_mock):
         full_name='Foo Bar',
         email='foo@email.com',
         password='hashed-password',
-        is_active=False
+        status=UserStatus.INACTIVE
     )
     password_mock.validate_password.return_value = True
     user_adapter_mock().fetch_by_email.return_value = user
