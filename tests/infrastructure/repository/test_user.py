@@ -1,7 +1,6 @@
 import uuid
 from unittest.mock import patch
 
-from auth.domain.event.user_created import UserCreated
 from auth.domain.user import User as UserDomain
 from auth.infrastructure.entity.user import User
 from auth.infrastructure.repository.user import UserRepository
@@ -66,14 +65,9 @@ def test_fetch_by_activation_code(database):
 @patch('auth.infrastructure.repository.user.bus')
 def test_emit_events(bus_mock, database):
     user = UserDomain(full_name='Foo Wrong', email='foo.bar@email.com', password='a-secret')
-    event = UserCreated(user)
-    entity = User(
-        full_name='Foo Wrong',
-        email='foo.bar@email.com',
-        password='a-secret',
-        events=[event]
-    )
+    user.add_user_created_event()
+    entity = User.from_domain(user)
 
     UserRepository().create(entity)
 
-    bus_mock.emit.assert_called_once_with(event.name, **event.to_dict())
+    bus_mock.emit.assert_called_once_with('user_created', user=user)

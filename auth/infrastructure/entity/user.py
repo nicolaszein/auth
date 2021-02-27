@@ -1,7 +1,6 @@
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime
-from typing import ClassVar, List, Optional
+from typing import List, Optional
 
 from auth.domain.event.event import Event
 from auth.domain.user import User as UserDomain
@@ -16,23 +15,26 @@ class User:
     is_active: Optional[bool] = False
 
     id: Optional[uuid.UUID] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
 
-    events: ClassVar[List[Event]] = field(default=[])
+    _events: Optional[List[Event]] = field(init=False, default=None)
     activations: List[Activation] = field(default_factory=lambda: [])
+
+    @property
+    def events(self):
+        return self._events or []
 
     @classmethod
     def from_domain(cls, domain):
-        return cls(
+        user = cls(
             id=domain.id,
             full_name=domain.full_name,
             email=domain.email,
             password=domain.password,
             is_active=domain.is_active,
             activations=[Activation.from_domain(activation) for activation in domain.activations],
-            events=domain.events
         )
+        user.__set_events(domain.events)
+        return user
 
     def to_domain(self):
         return UserDomain(
@@ -43,3 +45,6 @@ class User:
             is_active=self.is_active,
             activations=[activation.to_domain() for activation in self.activations]
         )
+
+    def __set_events(self, events):
+        self._events = events

@@ -27,7 +27,8 @@ class UserRepository:
         return self.__save(user)
 
     def update(self, user):
-        return self.__save(user)
+        user_updated = db.session.merge(user)
+        return self.__save(user_updated)
 
     def __save(self, user):
         try:
