@@ -1,5 +1,7 @@
 import json
+from datetime import datetime
 
+from auth.domain.activation import Activation
 from auth.domain.user import User
 from auth.infrastructure.entity.user import User as UserEntity
 from auth.infrastructure.repository.user import UserRepository
@@ -24,7 +26,28 @@ def test_activate_ok(database):
     assert result['statusCode'] == 204
 
 
-def test_activate_with_not_found_code_json(database):
+def test_activate_with_expired_code(database):
+    created_at = datetime(2020, 1, 1)
+    user = User(full_name='Foo Bar', email='foo.bar@email.com', password='a-secret')
+    activation = Activation(user=user, created_at=created_at)
+    user.activations.append(activation)
+    code = user.activations[0].code
+    entity = UserEntity.from_domain(user)
+    UserRepository().create(entity)
+    request_body = {
+        'code': code,
+    }
+    event = {
+        "body": json.dumps(request_body),
+    }
+
+    result = handle(event, None)
+
+    assert result['statusCode'] == 400
+    assert 'Activation Code expired' in result['body']
+
+
+def test_activate_with_not_found_code(database):
     request_body = {
         'code': 'not_found_code',
     }
@@ -35,7 +58,7 @@ def test_activate_with_not_found_code_json(database):
     result = handle(event, None)
 
     assert result['statusCode'] == 404
-    assert 'Code not found' in result['body']
+    assert 'Activation Code not found' in result['body']
 
 
 def test_activate_with_empty_code(database):
