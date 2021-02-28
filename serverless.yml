@@ -52,13 +52,21 @@ package:
     - pytest.ini
 
 functions:
-  signup:
+  sign-up:
     handler: auth/view/function/sign_up.handle
     layers:
       - { Ref: PythonRequirementsLambdaLayer }
     events:
       - http:
-          path: /signup
+          path: /sign-up
+          method: post
+  sign-in:
+    handler: auth/view/function/sign_in.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - http:
+          path: /sign-in
           method: post
   activate:
     handler: auth/view/function/activate.handle

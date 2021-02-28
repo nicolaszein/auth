@@ -52,7 +52,7 @@ class UserAdapter:
         return self.__repository.update(entity).to_domain()
 
     def create_session(self, user):
-        refresh_token = self.__token.generate_refresh_token(user_id=user.id)
+        refresh_token = self.__token.generate_refresh_token(user_id=str(user.id))
         session = self.__session_repository.create(
             Session(
                 user_id=user.id,
@@ -60,7 +60,7 @@ class UserAdapter:
             )
         )
 
-        access_token = self.__token.generate_token(user_id=user.id, session_id=session.id)
+        access_token = self.__token.generate_token(user_id=str(user.id), session_id=str(session.id))
 
         return SessionDomain(user=user, access_token=access_token, refresh_token=refresh_token)
 

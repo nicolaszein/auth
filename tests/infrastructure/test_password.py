@@ -7,6 +7,7 @@ def test_password_generate_password():
     hashed_password = Password.hash_password(password)
 
     assert hashed_password
+    assert isinstance(hashed_password, str)
     assert hashed_password != password
 
 

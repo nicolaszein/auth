@@ -149,8 +149,11 @@ def test_create_session(session_repository_mock, token_mock):
     assert result.user == user
     assert result.access_token == 'access_token'
     assert result.refresh_token == 'refresh_token'
-    token_mock().generate_refresh_token.assert_called_once_with(user_id=user_id)
-    token_mock().generate_token.assert_called_once_with(user_id=user_id, session_id=session.id)
+    token_mock().generate_refresh_token.assert_called_once_with(user_id=str(user_id))
+    token_mock().generate_token.assert_called_once_with(
+        user_id=str(user_id),
+        session_id=str(session.id)
+    )
 
 
 @patch('auth.infrastructure.user_adapter.SendgridClient')
