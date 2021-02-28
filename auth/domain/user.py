@@ -32,6 +32,10 @@ class User:
     def is_active(self):
         return self.status == UserStatus.ACTIVE
 
+    @property
+    def first_name(self):
+        return self.full_name.split()[0]
+
     def add_user_created_event(self):
         self.events.append(UserCreated(user=self))
 

@@ -109,3 +109,25 @@ def test_activate_with_expired_code():
 
     with pytest.raises(ActivationExpired):
         user.activate(code=activation.code)
+
+
+def test_first_name():
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='a-secret',
+    )
+
+    assert user.first_name == 'Foo'
+
+
+def test_first_name():
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='a-secret',
+    )
+
+    assert user.first_name == 'Foo'

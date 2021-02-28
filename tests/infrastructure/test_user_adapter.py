@@ -8,6 +8,7 @@ from auth.domain.user import User
 from auth.infrastructure.entity.session import Session
 from auth.infrastructure.exception import UserNotFound
 from auth.infrastructure.user_adapter import UserAdapter
+from auth.settings import ACTIVATION_EMAIL_TEMPLATE_ID
 
 
 @patch('auth.infrastructure.user_adapter.User')
@@ -150,3 +151,24 @@ def test_create_session(session_repository_mock, token_mock):
     assert result.refresh_token == 'refresh_token'
     token_mock().generate_refresh_token.assert_called_once_with(user_id=user_id)
     token_mock().generate_token.assert_called_once_with(user_id=user_id, session_id=session.id)
+
+
+@patch('auth.infrastructure.user_adapter.SendgridClient')
+def test_send_activation_email(sendgrid_client_mock):
+    code = uuid.uuid4()
+    user_id = uuid.uuid4()
+    user = User(
+        id=user_id,
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='hashed_password'
+    )
+
+    UserAdapter().send_activation_email(user=user, activation_code=code)
+
+    sendgrid_client_mock().send_template_message.assert_called_once_with(
+        to=user.email,
+        subject='Por favor, confirme seu endereço de email',
+        template_id=ACTIVATION_EMAIL_TEMPLATE_ID,
+        template_data=dict(first_name=user.first_name, code=code)
+    )
