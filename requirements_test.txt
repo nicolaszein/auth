@@ -1,3 +1,5 @@
 moto[all]==2.0.0
 freezegun==1.1.0
 pytest-asyncio==0.14.0
+pytest==6.2.2
+pytest-env==0.6.2

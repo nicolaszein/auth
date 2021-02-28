@@ -1,7 +1,8 @@
-import re
 import uuid
 from dataclasses import dataclass, field, replace
 from typing import List, Optional
+
+from email_validator import EmailNotValidError, validate_email
 
 from auth.domain.activation import Activation
 from auth.domain.event.activation_created import ActivationCreated
@@ -25,8 +26,9 @@ class User:
     activations: List[Activation] = field(default_factory=lambda: [])
 
     def __post_init__(self):
-        email_regex = re.compile(r'^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}$')
-        if not email_regex.match(self.email):
+        try:
+            validate_email(self.email)
+        except EmailNotValidError:
             raise UserWithInvalidEmail(f'{self.email} is invalid.')
 
     @property
