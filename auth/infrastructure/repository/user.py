@@ -24,11 +24,15 @@ class UserRepository:
         return activation.user
 
     def create(self, user):
-        return self.__save(user)
+        saved_user = self.__save(user)
+        self.__emit_events(user.events)
+        return saved_user
 
     def update(self, user):
-        user_updated = db.session.merge(user)
-        return self.__save(user_updated)
+        updated_user = db.session.merge(user)
+        saved_user = self.__save(updated_user)
+        self.__emit_events(user.events)
+        return saved_user
 
     def __save(self, user):
         try:
@@ -36,11 +40,12 @@ class UserRepository:
             db.session.commit()
             db.session.flush()
 
-            for event in user.events:
-                bus.emit(event.name, **event.to_dict())
-
             return user
         except Exception as e:
             db.session.rollback()
 
             raise e
+
+    def __emit_events(self, events):
+        for event in events:
+            bus.emit(event.name, **event.to_dict())

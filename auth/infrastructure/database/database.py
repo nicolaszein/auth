@@ -4,7 +4,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from auth.settings import DATABASE_URL
 
 engine = create_engine(DATABASE_URL)
-Session = scoped_session(sessionmaker(bind=engine, expire_on_commit=False))
+Session = scoped_session(sessionmaker(bind=engine))
 
 
 class Database:

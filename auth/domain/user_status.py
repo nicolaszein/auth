@@ -2,5 +2,5 @@ import enum
 
 
 class UserStatus(enum.Enum):
-    ACTIVE = 'active',
+    ACTIVE = 'active'
     INACTIVE = 'inactive'

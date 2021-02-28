@@ -4,6 +4,7 @@ from dataclasses import dataclass, field, replace
 from typing import List, Optional
 
 from auth.domain.activation import Activation
+from auth.domain.event.activation_created import ActivationCreated
 from auth.domain.event.event import Event
 from auth.domain.event.user_created import UserCreated
 from auth.domain.exception import ActivationExpired, ActivationNotFound, UserWithInvalidEmail
@@ -40,7 +41,9 @@ class User:
         self.events.append(UserCreated(user=self))
 
     def create_activation(self):
-        self.activations.append(Activation(user=self))
+        activation = Activation(user=self)
+        self.activations.append(activation)
+        self.events.append(ActivationCreated(activation=activation))
 
     def activate(self, code):
         filter_activation = filter(lambda activation: activation.code == code, self.activations)

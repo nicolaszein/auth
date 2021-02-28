@@ -4,6 +4,7 @@ import uuid
 import pytest
 
 from auth.domain.activation import Activation
+from auth.domain.event.activation_created import ActivationCreated
 from auth.domain.event.user_created import UserCreated
 from auth.domain.exception import ActivationExpired, ActivationNotFound, UserWithInvalidEmail
 from auth.domain.user import User
@@ -59,6 +60,8 @@ def test_create_activation():
 
     assert len(user.activations) == 1
     assert isinstance(user.activations[0], Activation)
+    assert len(user.events) == 1
+    assert isinstance(user.events[0], ActivationCreated)
 
 
 def test_activate():
