@@ -9,3 +9,4 @@ SQLAlchemy==1.3.23
 pydantic[email]==1.7.3
 boto3==1.17.16
 autodiscover==0.0.4
+sendgrid==6.6.0
