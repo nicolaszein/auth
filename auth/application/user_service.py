@@ -44,3 +44,8 @@ class UserService:
         user = self.__user_adapter.fetch_by_activation_code(code=code)
 
         return self.__user_adapter.update(user.activate(code=code))
+
+    def send_activation_email(self, user_id, activation_code):
+        user = self.__user_adapter.fetch_by_id(user_id)
+
+        self.__user_adapter.send_activation_email(user=user, activation_code=activation_code)
