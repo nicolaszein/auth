@@ -22,9 +22,12 @@ provider:
             - sqs:SendMessage
             - sqs:GetQueueUrl
           Resource:
-            Fn::GetAtt:
-              - UserQueue
-              - Arn
+            - Fn::GetAtt:
+                - UserQueue
+                - Arn
+            - Fn::GetAtt:
+                - ActivationQueue
+                - Arn
   environment:
     ENVIRONMENT: ${self:custom.stage}
     DATABASE_URL: ${ssm:/auth/${self:custom.stage}/DATABASE_URL~true}
@@ -74,6 +77,16 @@ functions:
             Fn::GetAtt:
               - UserQueue
               - Arn
+  send-activation-email:
+    handler: auth/view/function/send_activation_email.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - ActivationQueue
+              - Arn
 
 plugins:
   - serverless-offline
@@ -85,3 +98,7 @@ resources:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: "auth-${self:custom.stage}-user"
+    ActivationQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "auth-${self:custom.stage}-activation"
