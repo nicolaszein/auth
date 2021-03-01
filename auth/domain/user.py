@@ -47,7 +47,7 @@ class User:
         self.events.append(UserCreated(user=self))
 
     def create_reset_password_token(self):
-        token = secrets.token_urlsafe()
+        token = secrets.token_urlsafe(24)
         now = datetime.now()
         return replace(self, reset_password_token=token, reset_password_token_created_at=now)
 

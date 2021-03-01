@@ -85,6 +85,14 @@ functions:
       - http:
           path: /sign-out
           method: post
+  create-reset-password-token:
+    handler: auth/view/function/create_reset_password_token.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - http:
+          path: /reset-password
+          method: post
   activate:
     handler: auth/view/function/activate.handle
     layers:
