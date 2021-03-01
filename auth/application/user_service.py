@@ -54,6 +54,12 @@ class UserService:
         decoded_token = self.__token.validate_token(access_token)
         self.__user_adapter.delete_session(session_id=decoded_token['session_id'])
 
+    def create_reset_password_token(self, email):
+        user = self.__user_adapter.fetch_by_email(email=email)
+        updated_user = user.create_reset_password_token()
+
+        return self.__user_adapter.update(updated_user)
+
     def send_activation_email(self, user_id, activation_code):
         user = self.__user_adapter.fetch_by_id(user_id)
 

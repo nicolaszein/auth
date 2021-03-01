@@ -178,6 +178,23 @@ def test_sign_out(user_adapter_mock, token_mock):
 
 
 @patch('auth.application.user_service.UserAdapter')
+def test_create_reset_password_token(user_adapter_mock):
+    email = 'foo.bar@email.com'
+    user = Mock()
+    updated_user = Mock()
+    user.create_reset_password_token.return_value = updated_user
+    user_adapter_mock().fetch_by_email.return_value = user
+    user_adapter_mock().update.side_effect = lambda x: x
+
+    result = UserService().create_reset_password_token(email=email)
+
+    assert result == updated_user
+    user.create_reset_password_token.assert_called_once()
+    user_adapter_mock().fetch_by_email.assert_called_once_with(email=email)
+    user_adapter_mock().update.assert_called_once_with(updated_user)
+
+
+@patch('auth.application.user_service.UserAdapter')
 def test_send_activation_email(user_adapter_mock):
     activation_code = uuid.uuid4()
     user = User(
