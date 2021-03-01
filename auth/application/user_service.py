@@ -3,6 +3,7 @@ import uuid
 from auth.application.exception import InvalidCredentials, UserNotActivated
 from auth.domain.user import User
 from auth.infrastructure.password import Password
+from auth.infrastructure.token import Token
 from auth.infrastructure.user_adapter import UserAdapter
 
 
@@ -11,6 +12,7 @@ class UserService:
     def __init__(self):
         self.__user_adapter = UserAdapter()
         self.__password = Password
+        self.__token = Token()
 
     def sign_up(self, full_name, email, password):
         hashed_password = self.__password.hash_password(password)
@@ -47,6 +49,10 @@ class UserService:
 
     def refresh_session(self, refresh_token):
         return self.__user_adapter.refresh_session(refresh_token=refresh_token)
+
+    def sign_out(self, access_token):
+        decoded_token = self.__token.validate_token(access_token)
+        self.__user_adapter.delete_session(session_id=decoded_token['session_id'])
 
     def send_activation_email(self, user_id, activation_code):
         user = self.__user_adapter.fetch_by_id(user_id)

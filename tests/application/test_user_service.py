@@ -164,6 +164,19 @@ def test_refresh_session(user_adapter_mock):
     )
 
 
+@patch('auth.application.user_service.Token')
+@patch('auth.application.user_service.UserAdapter')
+def test_sign_out(user_adapter_mock, token_mock):
+    session_id = str(uuid.uuid4())
+    access_token = str(uuid.uuid4())
+    token_mock().validate_token.return_value = dict(session_id=session_id)
+
+    UserService().sign_out(access_token=access_token)
+
+    user_adapter_mock().delete_session.assert_called_once_with(session_id=session_id)
+    token_mock().validate_token.assert_called_once_with(access_token)
+
+
 @patch('auth.application.user_service.UserAdapter')
 def test_send_activation_email(user_adapter_mock):
     activation_code = uuid.uuid4()
