@@ -8,7 +8,7 @@ from auth.domain.user import User
 from auth.infrastructure.entity.session import Session
 from auth.infrastructure.exception import SessionNotFound, UserNotFound
 from auth.infrastructure.user_adapter import UserAdapter
-from auth.settings import ACTIVATION_EMAIL_TEMPLATE_ID
+from auth.settings import ACTIVATION_EMAIL_TEMPLATE_ID, RESET_PASSWORD_EMAIL_TEMPLATE_ID
 
 
 @patch('auth.infrastructure.user_adapter.User')
@@ -222,4 +222,25 @@ def test_send_activation_email(sendgrid_client_mock):
         subject='Por favor, confirme seu endereço de email',
         template_id=ACTIVATION_EMAIL_TEMPLATE_ID,
         template_data=dict(first_name=user.first_name, code=code)
+    )
+
+
+@patch('auth.infrastructure.user_adapter.SendgridClient')
+def test_send_reset_password_email(sendgrid_client_mock):
+    token = str(uuid.uuid4())
+    user_id = uuid.uuid4()
+    user = User(
+        id=user_id,
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='hashed_password'
+    )
+
+    UserAdapter().send_reset_password_email(user=user, reset_password_token=token)
+
+    sendgrid_client_mock().send_template_message.assert_called_once_with(
+        to=user.email,
+        subject='Redefinir Senha',
+        template_id=RESET_PASSWORD_EMAIL_TEMPLATE_ID,
+        template_data=dict(first_name=user.first_name, token=token)
     )

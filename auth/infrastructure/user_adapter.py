@@ -6,7 +6,7 @@ from auth.infrastructure.repository.session import SessionRepository
 from auth.infrastructure.repository.user import UserRepository
 from auth.infrastructure.sendgrid_client import SendgridClient
 from auth.infrastructure.token import Token
-from auth.settings import ACTIVATION_EMAIL_TEMPLATE_ID
+from auth.settings import ACTIVATION_EMAIL_TEMPLATE_ID, RESET_PASSWORD_EMAIL_TEMPLATE_ID
 
 
 class UserAdapter:
@@ -93,5 +93,16 @@ class UserAdapter:
             to=user.email,
             subject=subject,
             template_id=ACTIVATION_EMAIL_TEMPLATE_ID,
+            template_data=template_data
+        )
+
+    def send_reset_password_email(self, user, reset_password_token):
+        subject = 'Redefinir Senha'
+        template_data = dict(first_name=user.first_name, token=reset_password_token)
+
+        self.__sendgrid_client.send_template_message(
+            to=user.email,
+            subject=subject,
+            template_id=RESET_PASSWORD_EMAIL_TEMPLATE_ID,
             template_data=template_data
         )

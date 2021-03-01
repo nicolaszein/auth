@@ -52,7 +52,7 @@ class User:
         now = datetime.now()
 
         user = replace(self, reset_password_token=token, reset_password_token_created_at=now)
-        user.events.append(ResetPasswordTokenCreated(user=self))
+        user.events.append(ResetPasswordTokenCreated(user=user))
 
         return user
 

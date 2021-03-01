@@ -124,6 +124,16 @@ functions:
             Fn::GetAtt:
               - ActivationQueue
               - Arn
+  send-reset-password-email:
+    handler: auth/view/function/send_reset_password_email.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - ResetPasswordQueue
+              - Arn
 
 plugins:
   - serverless-offline

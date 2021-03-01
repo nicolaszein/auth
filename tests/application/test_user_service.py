@@ -211,3 +211,22 @@ def test_send_activation_email(user_adapter_mock):
         user=user,
         activation_code=activation_code
     )
+
+
+@patch('auth.application.user_service.UserAdapter')
+def test_send_reset_password_email(user_adapter_mock):
+    token = uuid.uuid4()
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email='foo@email.com',
+        password='hashed-password',
+    )
+    user_adapter_mock().fetch_by_id.return_value = user
+
+    UserService().send_reset_password_email(user_id=user.id, reset_password_token=token)
+
+    user_adapter_mock().send_reset_password_email.assert_called_once_with(
+        user=user,
+        reset_password_token=token
+    )

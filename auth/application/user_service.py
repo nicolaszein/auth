@@ -64,3 +64,11 @@ class UserService:
         user = self.__user_adapter.fetch_by_id(user_id)
 
         self.__user_adapter.send_activation_email(user=user, activation_code=activation_code)
+
+    def send_reset_password_email(self, user_id, reset_password_token):
+        user = self.__user_adapter.fetch_by_id(user_id)
+
+        self.__user_adapter.send_reset_password_email(
+            user=user,
+            reset_password_token=reset_password_token
+        )
