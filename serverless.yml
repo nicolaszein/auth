@@ -32,6 +32,7 @@ provider:
     ENVIRONMENT: ${self:custom.stage}
     DATABASE_URL: ${ssm:/auth/${self:custom.stage}/DATABASE_URL~true}
     SENDGRID_API_KEY: ${ssm:/auth/${self:custom.stage}/SENDGRID_API_KEY~true}
+    JWT_SECRET_TOKEN: ${ssm:/auth/${self:custom.stage}/JWT_SECRET_TOKEN~true}
   apiGateway:
     shouldStartNameWithService: true
 
@@ -75,6 +76,14 @@ functions:
     events:
       - http:
           path: /refresh-token
+          method: post
+  sign-out:
+    handler: auth/view/function/sign_out.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - http:
+          path: /sign-out
           method: post
   activate:
     handler: auth/view/function/activate.handle
