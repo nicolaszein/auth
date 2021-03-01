@@ -83,6 +83,20 @@ def test_fetch_by_activation_code(database):
     assert user.id == entity.id
 
 
+def test_fetch_by_reset_password_token(database):
+    user = UserDomain(
+        full_name='Foo Wrong',
+        email='foo.bar@email.com',
+        password='a-secret',
+    )
+    entity = User.from_domain(user.create_reset_password_token())
+    UserRepository().create(entity)
+
+    user = UserRepository().fetch_by_reset_password_token(entity.reset_password_token)
+
+    assert user.id == entity.id
+
+
 @patch('auth.infrastructure.repository.user.bus')
 def test_emit_events(bus_mock, database):
     user = UserDomain(full_name='Foo Wrong', email='foo.bar@email.com', password='a-secret')

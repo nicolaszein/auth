@@ -129,6 +129,33 @@ def test_fetch_by_activation_code_with_user_not_found(user_repository_mock):
         UserAdapter().fetch_by_activation_code(code=code)
 
 
+@patch('auth.infrastructure.user_adapter.UserRepository')
+def test_fetch_by_reset_password_token(user_repository_mock):
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='hashed_password'
+    )
+    user_entity = MagicMock()
+    user_repository_mock().fetch_by_reset_password_token.return_value = user_entity
+    user_entity.to_domain.return_value = user
+    reset_password_token = '123'
+
+    result = UserAdapter().fetch_by_reset_password_token(reset_password_token=reset_password_token)
+
+    assert result == user
+
+
+@patch('auth.infrastructure.user_adapter.UserRepository')
+def test_fetch_by_reset_password_token_with_user_not_found(user_repository_mock):
+    reset_password_token = '123'
+    user_repository_mock().fetch_by_reset_password_token.return_value = None
+
+    with pytest.raises(UserNotFound):
+        UserAdapter().fetch_by_reset_password_token(reset_password_token=reset_password_token)
+
+
 @patch('auth.infrastructure.user_adapter.Token')
 @patch('auth.infrastructure.user_adapter.SessionRepository')
 def test_create_session(session_repository_mock, token_mock):

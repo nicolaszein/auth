@@ -23,6 +23,11 @@ class UserRepository:
 
         return activation.user
 
+    def fetch_by_reset_password_token(self, reset_password_token):
+        return db.session.query(self.__entity).filter_by(
+            reset_password_token=reset_password_token
+        ).first()
+
     def create(self, user):
         saved_user = self.__save(user)
         self.__emit_events(user.events)

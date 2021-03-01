@@ -41,6 +41,14 @@ class UserAdapter:
 
         return user.to_domain()
 
+    def fetch_by_reset_password_token(self, reset_password_token):
+        user = self.__repository.fetch_by_reset_password_token(reset_password_token)
+
+        if not user:
+            raise UserNotFound(f'User with reset password token {reset_password_token} not found')
+
+        return user.to_domain()
+
     def create(self, user):
         entity = User.from_domain(user)
 
