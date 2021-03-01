@@ -152,6 +152,19 @@ def test_activate(user_adapter_mock):
 
 
 @patch('auth.application.user_service.UserAdapter')
+def test_refresh_session(user_adapter_mock):
+    refresh_token = uuid.uuid4()
+    user_adapter_mock().refresh_session.return_value = 'session-instance'
+
+    result = UserService().refresh_session(refresh_token=refresh_token)
+
+    assert result == 'session-instance'
+    user_adapter_mock().refresh_session.assert_called_once_with(
+        refresh_token=refresh_token
+    )
+
+
+@patch('auth.application.user_service.UserAdapter')
 def test_send_activation_email(user_adapter_mock):
     activation_code = uuid.uuid4()
     user = User(

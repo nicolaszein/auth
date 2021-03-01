@@ -68,6 +68,14 @@ functions:
       - http:
           path: /sign-in
           method: post
+  refresh-session:
+    handler: auth/view/function/refresh_session.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - http:
+          path: /refresh-token
+          method: post
   activate:
     handler: auth/view/function/activate.handle
     layers:

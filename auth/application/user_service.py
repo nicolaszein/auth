@@ -45,6 +45,9 @@ class UserService:
 
         return self.__user_adapter.update(user.activate(code=code))
 
+    def refresh_session(self, refresh_token):
+        return self.__user_adapter.refresh_session(refresh_token=refresh_token)
+
     def send_activation_email(self, user_id, activation_code):
         user = self.__user_adapter.fetch_by_id(user_id)
 
