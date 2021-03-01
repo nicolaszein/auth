@@ -81,6 +81,10 @@ class UserAdapter:
             refresh_token=refresh_token
         )
 
+    def delete_session(self, session_id):
+        session = self.__session_repository.fetch_by_id(id=session_id)
+        self.__session_repository.delete(session=session)
+
     def send_activation_email(self, user, activation_code):
         subject = 'Por favor, confirme seu endereço de email'
         template_data = dict(first_name=user.first_name, code=activation_code)

@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import replace
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
@@ -190,6 +190,18 @@ def test_refresh_session_with_session_not_found(session_repository_mock):
 
     with pytest.raises(SessionNotFound):
         UserAdapter().refresh_session(refresh_token)
+
+
+@patch('auth.infrastructure.user_adapter.SessionRepository')
+def test_delete_session(session_repository_mock):
+    session_id = uuid.uuid4()
+    session = Mock()
+    session_repository_mock().fetch_by_id.return_value = session
+
+    UserAdapter().delete_session(session_id=session_id)
+
+    session_repository_mock().fetch_by_id.assert_called_once_with(id=session_id)
+    session_repository_mock().delete.assert_called_once_with(session=session)
 
 
 @patch('auth.infrastructure.user_adapter.SendgridClient')
