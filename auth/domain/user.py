@@ -9,6 +9,7 @@ from email_validator import EmailNotValidError, validate_email
 from auth.domain.activation import Activation
 from auth.domain.event.activation_created import ActivationCreated
 from auth.domain.event.event import Event
+from auth.domain.event.reset_password_token_created import ResetPasswordTokenCreated
 from auth.domain.event.user_created import UserCreated
 from auth.domain.exception import ActivationExpired, ActivationNotFound, UserWithInvalidEmail
 from auth.domain.user_status import UserStatus
@@ -49,7 +50,11 @@ class User:
     def create_reset_password_token(self):
         token = secrets.token_urlsafe(24)
         now = datetime.now()
-        return replace(self, reset_password_token=token, reset_password_token_created_at=now)
+
+        user = replace(self, reset_password_token=token, reset_password_token_created_at=now)
+        user.events.append(ResetPasswordTokenCreated(user=self))
+
+        return user
 
     def create_activation(self):
         activation = Activation(user=self)

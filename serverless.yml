@@ -26,6 +26,9 @@ provider:
                 - UserQueue
                 - Arn
             - Fn::GetAtt:
+                - ResetPasswordQueue
+                - Arn
+            - Fn::GetAtt:
                 - ActivationQueue
                 - Arn
   environment:
@@ -132,6 +135,10 @@ resources:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: "auth-${self:custom.stage}-user"
+    ResetPasswordQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "auth-${self:custom.stage}-reset-password"
     ActivationQueue:
       Type: "AWS::SQS::Queue"
       Properties:

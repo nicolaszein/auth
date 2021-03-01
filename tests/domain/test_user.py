@@ -148,3 +148,4 @@ def test_create_reset_password_token():
 
     assert updated_user.reset_password_token
     assert updated_user.reset_password_token_created_at
+    assert len(updated_user.events) == 1
