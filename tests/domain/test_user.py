@@ -134,3 +134,17 @@ def test_first_name():
     )
 
     assert user.first_name == 'Foo'
+
+
+def test_create_reset_password_token():
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='a-secret',
+    )
+
+    updated_user = user.create_reset_password_token()
+
+    assert updated_user.reset_password_token
+    assert updated_user.reset_password_token_created_at

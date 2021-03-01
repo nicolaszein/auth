@@ -1,3 +1,4 @@
+import secrets
 import uuid
 from dataclasses import dataclass, field, replace
 from datetime import datetime
@@ -44,6 +45,11 @@ class User:
 
     def add_user_created_event(self):
         self.events.append(UserCreated(user=self))
+
+    def create_reset_password_token(self):
+        token = secrets.token_urlsafe()
+        now = datetime.now()
+        return replace(self, reset_password_token=token, reset_password_token_created_at=now)
 
     def create_activation(self):
         activation = Activation(user=self)
