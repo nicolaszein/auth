@@ -96,6 +96,14 @@ functions:
       - http:
           path: /reset-password
           method: post
+  reset-password:
+    handler: auth/view/function/reset_password.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - http:
+          path: /reset-password/{reset_password_token}
+          method: post
   activate:
     handler: auth/view/function/activate.handle
     layers:
