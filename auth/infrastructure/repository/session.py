@@ -1,7 +1,14 @@
 from auth.infrastructure.database import db
+from auth.infrastructure.entity.session import Session
 
 
 class SessionRepository:
+
+    def __init__(self):
+        self.__entity = Session
+
+    def fetch_by_refresh_token(self, refresh_token):
+        return db.session.query(self.__entity).filter_by(refresh_token=refresh_token).first()
 
     def create(self, session):
         try:

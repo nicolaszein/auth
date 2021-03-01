@@ -6,7 +6,7 @@ import pytest
 
 from auth.domain.user import User
 from auth.infrastructure.entity.session import Session
-from auth.infrastructure.exception import UserNotFound
+from auth.infrastructure.exception import SessionNotFound, UserNotFound
 from auth.infrastructure.user_adapter import UserAdapter
 from auth.settings import ACTIVATION_EMAIL_TEMPLATE_ID
 
@@ -154,6 +154,42 @@ def test_create_session(session_repository_mock, token_mock):
         user_id=str(user_id),
         session_id=str(session.id)
     )
+
+
+@patch('auth.infrastructure.user_adapter.Token')
+@patch('auth.infrastructure.user_adapter.SessionRepository')
+def test_refresh_session(session_repository_mock, token_mock):
+    user_id = uuid.uuid4()
+    refresh_token = 'refresh_token'
+    user = User(
+        id=user_id,
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='hashed_password'
+    )
+    session = Session(id=uuid.uuid4(), user_id=user_id, refresh_token=refresh_token)
+    session.user = user
+    session_repository_mock().fetch_by_refresh_token.return_value = session
+    token_mock().generate_token.return_value = 'refreshed_access_token'
+
+    result = UserAdapter().refresh_session(refresh_token)
+
+    assert result.user == user
+    assert result.access_token == 'refreshed_access_token'
+    assert result.refresh_token == refresh_token
+    token_mock().generate_token.assert_called_once_with(
+        user_id=str(user_id),
+        session_id=str(session.id)
+    )
+
+
+@patch('auth.infrastructure.user_adapter.SessionRepository')
+def test_refresh_session_with_session_not_found(session_repository_mock):
+    refresh_token = 'refresh_token'
+    session_repository_mock().fetch_by_refresh_token.return_value = None
+
+    with pytest.raises(SessionNotFound):
+        UserAdapter().refresh_session(refresh_token)
 
 
 @patch('auth.infrastructure.user_adapter.SendgridClient')

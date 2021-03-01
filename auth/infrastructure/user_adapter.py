@@ -1,7 +1,7 @@
 from auth.domain.session import Session as SessionDomain
 from auth.infrastructure.entity.session import Session
 from auth.infrastructure.entity.user import User
-from auth.infrastructure.exception import UserNotFound
+from auth.infrastructure.exception import SessionNotFound, UserNotFound
 from auth.infrastructure.repository.session import SessionRepository
 from auth.infrastructure.repository.user import UserRepository
 from auth.infrastructure.sendgrid_client import SendgridClient
@@ -63,6 +63,23 @@ class UserAdapter:
         access_token = self.__token.generate_token(user_id=str(user.id), session_id=str(session.id))
 
         return SessionDomain(user=user, access_token=access_token, refresh_token=refresh_token)
+
+    def refresh_session(self, refresh_token):
+        session = self.__session_repository.fetch_by_refresh_token(refresh_token=refresh_token)
+
+        if not session:
+            raise SessionNotFound('Session not found')
+
+        access_token = self.__token.generate_token(
+            user_id=str(session.user_id),
+            session_id=str(session.id)
+        )
+
+        return SessionDomain(
+            user=session.user,
+            access_token=access_token,
+            refresh_token=refresh_token
+        )
 
     def send_activation_email(self, user, activation_code):
         subject = 'Por favor, confirme seu endereço de email'
