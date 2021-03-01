@@ -1,5 +1,6 @@
 import uuid
 from dataclasses import dataclass, field, replace
+from datetime import datetime
 from typing import List, Optional
 
 from email_validator import EmailNotValidError, validate_email
@@ -20,6 +21,8 @@ class User:
 
     id: Optional[uuid.UUID] = None
     status: Optional[UserStatus] = UserStatus.INACTIVE
+    reset_password_token: Optional[str] = None
+    reset_password_token_created_at: Optional[datetime] = None
 
     events: List[Event] = field(init=False, default_factory=lambda: [])
 
