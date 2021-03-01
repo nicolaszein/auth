@@ -194,6 +194,28 @@ def test_create_reset_password_token(user_adapter_mock):
     user_adapter_mock().update.assert_called_once_with(updated_user)
 
 
+@patch('auth.application.user_service.Password')
+@patch('auth.application.user_service.UserAdapter')
+def test_reset_password_token(user_adapter_mock, password_mock):
+    user = Mock()
+    updated_user = Mock()
+    user.reset_password.return_value = updated_user
+    password_mock.hash_password.return_value = 'new-hashed-password'
+    user_adapter_mock().fetch_by_reset_password_token.return_value = user
+    user_adapter_mock().update.side_effect = lambda x: x
+
+    result = UserService().reset_password(new_password='new-password', reset_password_token='token')
+
+    assert result == updated_user
+    user.reset_password.assert_called_once_with(
+        new_password='new-hashed-password',
+        reset_password_token='token'
+    )
+    user_adapter_mock().fetch_by_reset_password_token.assert_called_once_with('token')
+    user_adapter_mock().update.assert_called_once_with(updated_user)
+    password_mock.hash_password.assert_called_once_with('new-password')
+
+
 @patch('auth.application.user_service.UserAdapter')
 def test_send_activation_email(user_adapter_mock):
     activation_code = uuid.uuid4()

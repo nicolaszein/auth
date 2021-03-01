@@ -60,6 +60,17 @@ class UserService:
 
         return self.__user_adapter.update(updated_user)
 
+    def reset_password(self, new_password, reset_password_token):
+        hashed_password = self.__password.hash_password(new_password)
+        user = self.__user_adapter.fetch_by_reset_password_token(reset_password_token)
+
+        updated_user = user.reset_password(
+            new_password=hashed_password,
+            reset_password_token=reset_password_token
+        )
+
+        return self.__user_adapter.update(updated_user)
+
     def send_activation_email(self, user_id, activation_code):
         user = self.__user_adapter.fetch_by_id(user_id)
 
