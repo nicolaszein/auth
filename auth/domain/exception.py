@@ -8,3 +8,11 @@ class ActivationNotFound(Exception):
 
 class ActivationExpired(Exception):
     pass
+
+
+class InvalidResetPasswordToken(Exception):
+    pass
+
+
+class ResetPasswordTokenExpired(Exception):
+    pass

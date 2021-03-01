@@ -1,7 +1,7 @@
 import secrets
 import uuid
 from dataclasses import dataclass, field, replace
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional
 
 from email_validator import EmailNotValidError, validate_email
@@ -11,8 +11,12 @@ from auth.domain.event.activation_created import ActivationCreated
 from auth.domain.event.event import Event
 from auth.domain.event.reset_password_token_created import ResetPasswordTokenCreated
 from auth.domain.event.user_created import UserCreated
-from auth.domain.exception import ActivationExpired, ActivationNotFound, UserWithInvalidEmail
+from auth.domain.exception import (
+    ActivationExpired, ActivationNotFound, InvalidResetPasswordToken,
+    ResetPasswordTokenExpired, UserWithInvalidEmail
+)
 from auth.domain.user_status import UserStatus
+from auth.settings import RESET_PASSWORD_TOKEN_EXPIRE_TIME
 
 
 @dataclass(frozen=True)
@@ -44,6 +48,11 @@ class User:
     def first_name(self):
         return self.full_name.split()[0]
 
+    @property
+    def reset_password_token_expires_in(self):
+        expires_in_timedelta = timedelta(seconds=RESET_PASSWORD_TOKEN_EXPIRE_TIME)
+        return self.reset_password_token_created_at + expires_in_timedelta
+
     def add_user_created_event(self):
         self.events.append(UserCreated(user=self))
 
@@ -73,3 +82,21 @@ class User:
 
         self.activations.remove(activation)
         return replace(self, status=UserStatus.ACTIVE)
+
+    def reset_password(self, new_password, reset_password_token):
+        if reset_password_token != self.reset_password_token:
+            raise InvalidResetPasswordToken(
+                f'Token {reset_password_token} does not match with current reset_password_token'
+            )
+
+        if datetime.now() > self.reset_password_token_expires_in:
+            raise ResetPasswordTokenExpired(
+                f'Token {reset_password_token} is expired'
+            )
+
+        return replace(
+            self,
+            password=new_password,
+            reset_password_token=None,
+            reset_password_token_created_at=None
+        )

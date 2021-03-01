@@ -6,7 +6,10 @@ import pytest
 from auth.domain.activation import Activation
 from auth.domain.event.activation_created import ActivationCreated
 from auth.domain.event.user_created import UserCreated
-from auth.domain.exception import ActivationExpired, ActivationNotFound, UserWithInvalidEmail
+from auth.domain.exception import (
+    ActivationExpired, ActivationNotFound, InvalidResetPasswordToken,
+    ResetPasswordTokenExpired, UserWithInvalidEmail
+)
 from auth.domain.user import User
 from auth.domain.user_status import UserStatus
 
@@ -149,3 +152,54 @@ def test_create_reset_password_token():
     assert updated_user.reset_password_token
     assert updated_user.reset_password_token_created_at
     assert len(updated_user.events) == 1
+
+
+def test_reset_password_ok():
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='a-secret',
+    ).create_reset_password_token()
+
+    updated_user = user.reset_password(
+        new_password='new-secret',
+        reset_password_token=user.reset_password_token
+    )
+
+    assert not updated_user.reset_password_token
+    assert not updated_user.reset_password_token_created_at
+    assert updated_user.password == 'new-secret'
+
+
+def test_reset_password_with_wrong_token():
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='a-secret',
+    ).create_reset_password_token()
+
+    with pytest.raises(InvalidResetPasswordToken):
+        user.reset_password(
+            new_password='new-secret',
+            reset_password_token='wrong'
+        )
+
+
+def test_reset_password_with_expired_token():
+    expires_in = datetime.datetime(2020, 1, 1)
+    user = User(
+        id=uuid.uuid4(),
+        full_name='Foo Bar',
+        email='foo.bar@email.com',
+        password='a-secret',
+        reset_password_token='reset-token',
+        reset_password_token_created_at=expires_in
+    )
+
+    with pytest.raises(ResetPasswordTokenExpired):
+        user.reset_password(
+            new_password='new-secret',
+            reset_password_token='reset-token'
+        )
