@@ -20,6 +20,8 @@ user_table = Table(
     Column('email', String(255), nullable=False, unique=True),
     Column('password', String(), nullable=False),
     Column('status', String(20), nullable=False),
+    Column('reset_password_token', String(32), nullable=True, index=True),
+    Column('reset_password_token_created_at', DateTime(), nullable=True),
     Column(
         'created_at',
         DateTime(),
