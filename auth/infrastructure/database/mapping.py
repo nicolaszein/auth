@@ -51,7 +51,7 @@ activation_table = Table(
     db.metadata,
     Column('id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     Column('user_id', UUID(as_uuid=True), ForeignKey('user.id'), nullable=False, index=True),
-    Column('code', String(255), nullable=False, unique=True),
+    Column('code', String(50), nullable=False, unique=True),
     Column(
         'created_at',
         DateTime(),
