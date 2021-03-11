@@ -1,0 +1,48 @@
+service: auth-migration
+frameworkVersion: '2'
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  pythonRequirements:
+    slim: true
+    strip: false
+    layer: true
+    dockerizePip: non-linux
+    fileName: ../requirements.txt
+
+provider:
+  name: aws
+  stage: dev
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  environment:
+    ENVIRONMENT: ${self:custom.stage}
+    DATABASE_URL: ${ssm:/auth/${self:custom.stage}/DATABASE_URL~true}
+
+package:
+  exclude:
+    - .cache/**
+    - .git/**
+    - .github/**
+    - .pytest_cache/**
+    - .DS_Store
+    - node_modules/**
+    - Makefile
+    - package-lock.json
+    - README.md
+    - LICENSE
+    - .gitignore
+    - tests/**
+    - pytest.ini
+  include:
+    - ../alembic.ini
+    - ../auth/**
+
+functions:
+  migration:
+    handler: migration.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+
+plugins:
+  - serverless-python-requirements
