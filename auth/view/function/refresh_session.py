@@ -1,7 +1,7 @@
 from auth.application.user_service import UserService
 from auth.infrastructure.exception import SessionNotFound
 from auth.view.decorator import validate_request_body
-from auth.view.helper import build_error_response
+from auth.view.helper import build_error_response, build_success_response
 from auth.view.resource.refresh_session_request import RefreshSessionRequest
 from auth.view.resource.session_response import SessionResponse
 
@@ -17,9 +17,9 @@ def handle(request, event, context):
             message='Invalid credentials.',
         )
 
-    response = {
-        'statusCode': 200,
-        'body': SessionResponse.from_domain(session).json()
-    }
+    response = build_success_response(
+        status_code=200,
+        body=SessionResponse.from_domain(session).json()
+    )
 
     return response

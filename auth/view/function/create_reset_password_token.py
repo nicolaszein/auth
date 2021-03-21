@@ -1,6 +1,7 @@
 from auth.application.user_service import UserService
 from auth.infrastructure.exception import UserNotFound
 from auth.view.decorator import validate_request_body
+from auth.view.helper import build_success_response
 from auth.view.resource.create_reset_password_request import CreateResetPasswordRequest
 
 
@@ -11,9 +12,4 @@ def handle(request, event, context):
     except UserNotFound:
         pass
 
-    response = {
-        'statusCode': 204,
-        'body': ''
-    }
-
-    return response
+    return build_success_response(status_code=204)

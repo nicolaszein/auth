@@ -2,7 +2,7 @@ from auth.application.user_service import UserService
 from auth.domain.exception import ResetPasswordTokenExpired
 from auth.infrastructure.exception import UserNotFound
 from auth.view.decorator import validate_request_body
-from auth.view.helper import build_error_response
+from auth.view.helper import build_error_response, build_success_response
 from auth.view.resource.reset_password_request import ResetPasswordRequest
 
 
@@ -28,7 +28,4 @@ def handle(request, event, context):
             message='Reset password token expired',
         )
 
-    return {
-        'statusCode': 204,
-        'body': ''
-    }
+    return build_success_response(status_code=204)

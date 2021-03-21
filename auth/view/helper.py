@@ -10,8 +10,12 @@ def build_error_response(status_code, code, message, details=None):
         body['details'] = details
 
     return {
-        "statusCode": status_code,
-        "body": json.dumps(body)
+        'statusCode': status_code,
+        'body': json.dumps(body),
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True,
+        }
     }
 
 
@@ -24,3 +28,14 @@ def build_input_error_response(errors):
         message='Some fields are not valid',
         details=details
     )
+
+
+def build_success_response(status_code, body=None):
+    return {
+        'statusCode': status_code,
+        'body': body or '',
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True,
+        }
+    }

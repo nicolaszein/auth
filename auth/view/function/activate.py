@@ -2,7 +2,7 @@ from auth.application.user_service import UserService
 from auth.domain.exception import ActivationExpired
 from auth.infrastructure.exception import UserNotFound
 from auth.view.decorator import validate_request_body
-from auth.view.helper import build_error_response
+from auth.view.helper import build_error_response, build_success_response
 from auth.view.resource.activate_request import ActivateRequest
 
 
@@ -23,9 +23,4 @@ def handle(request, event, context):
             message='Activation Code expired',
         )
 
-    response = {
-        'statusCode': 204,
-        'body': ''
-    }
-
-    return response
+    return build_success_response(status_code=204)

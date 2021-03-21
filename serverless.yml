@@ -42,6 +42,7 @@ provider:
 package:
   exclude:
     - .cache/**
+    - .__pycache__/**
     - .git/**
     - .github/**
     - .pytest_cache/**
@@ -53,6 +54,7 @@ package:
     - LICENSE
     - .gitignore
     - tests/**
+    - migrations/**
     - pytest.ini
 
 functions:
@@ -64,6 +66,7 @@ functions:
       - http:
           path: /sign-up
           method: post
+          cors: true
   sign-in:
     handler: auth/view/function/sign_in.handle
     layers:
@@ -72,6 +75,7 @@ functions:
       - http:
           path: /sign-in
           method: post
+          cors: true
   refresh-session:
     handler: auth/view/function/refresh_session.handle
     layers:
@@ -80,6 +84,7 @@ functions:
       - http:
           path: /refresh-token
           method: post
+          cors: true
   sign-out:
     handler: auth/view/function/sign_out.handle
     layers:
@@ -88,6 +93,7 @@ functions:
       - http:
           path: /sign-out
           method: post
+          cors: true
   create-reset-password-token:
     handler: auth/view/function/create_reset_password_token.handle
     layers:
@@ -96,6 +102,7 @@ functions:
       - http:
           path: /reset-password
           method: post
+          cors: true
   reset-password:
     handler: auth/view/function/reset_password.handle
     layers:
@@ -104,6 +111,7 @@ functions:
       - http:
           path: /reset-password/{reset_password_token}
           method: post
+          cors: true
   activate:
     handler: auth/view/function/activate.handle
     layers:
@@ -112,6 +120,7 @@ functions:
       - http:
           path: /users/activate
           method: post
+          cors: true
   create-activation:
     handler: auth/view/function/create_activation.handle
     layers:

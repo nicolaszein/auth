@@ -1,5 +1,6 @@
 from auth.application.user_service import UserService
 from auth.view.decorator import validate_request_body
+from auth.view.helper import build_success_response
 from auth.view.resource.sign_up_request import SignUpRequest
 
 
@@ -11,9 +12,4 @@ def handle(request, event, context):
         password=request.password
     )
 
-    response = {
-        'statusCode': 204,
-        'body': ''
-    }
-
-    return response
+    return build_success_response(status_code=204)

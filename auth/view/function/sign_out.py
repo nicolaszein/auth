@@ -1,7 +1,7 @@
 from jwt import DecodeError, InvalidSignatureError
 
 from auth.application.user_service import UserService
-from auth.view.helper import build_error_response
+from auth.view.helper import build_error_response, build_success_response
 
 
 def handle(event, context):
@@ -25,7 +25,4 @@ def handle(event, context):
     except (InvalidSignatureError, DecodeError):
         return invalid_credentials_response
 
-    return {
-        'statusCode': 204,
-        'body': ''
-    }
+    return build_success_response(status_code=204)
