@@ -121,6 +121,15 @@ functions:
           path: /users/activate
           method: post
           cors: true
+  profile:
+    handler: auth/view/function/profile.handle
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - http:
+          path: /profile
+          method: get
+          cors: true
   create-activation:
     handler: auth/view/function/create_activation.handle
     layers:

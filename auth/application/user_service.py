@@ -14,6 +14,9 @@ class UserService:
         self.__password = Password
         self.__token = Token()
 
+    def fetch_by_id(self, id):
+        return self.__user_adapter.fetch_by_id(id)
+
     def sign_up(self, full_name, email, password):
         hashed_password = self.__password.hash_password(password)
         user = User(
